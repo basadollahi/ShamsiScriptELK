@@ -22,7 +22,8 @@ mvn clean package  -DskipTests=true
 
 ## Installation
 
-    $ $ES_HOME/bin/elasticsearch-plugin install org.codelibs:elasticsearch-minhash:7.17.0
+    $ $ES_HOME/bin/elasticsearch-plugin install file:///{HOME_DIR}/elasticsearch-minhash-7.17.0.zip
+
 
 ## Getting Started
 
