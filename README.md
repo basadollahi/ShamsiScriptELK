@@ -128,58 +128,59 @@ To change the number of bits and hashes, set them to a token filter setting:
 
 
 
+### Change the number of bits and hashes
 
-DELETE /my_index
-
-PUT /my_index
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0,
-    "index.max_ngram_diff": 10,
-    "analysis": {
-      "analyzer": {
-        "minhash_analyzer":{
-          "type":"custom",
-          "tokenizer":"standard",
-          "filter":["minhash"]
+    DELETE /my_index
+    
+    PUT /my_index
+    {
+      "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "index.max_ngram_diff": 10,
+        "analysis": {
+          "analyzer": {
+            "minhash_analyzer":{
+              "type":"custom",
+              "tokenizer":"standard",
+              "filter":["minhash"]
+            }
+          }
         }
+      },
+      "mappings": {
+        "properties":{
+        "message":{
+          "type":"keyword",
+          "copy_to":"minhash_value"
+        },
+        "minhash_value":{
+          "type":"minhash",
+          "store":true,
+          "minhash_analyzer":"minhash_analyzer"
+        }
+       }
       }
     }
-  },
-  "mappings": {
-    "properties":{
-    "message":{
-      "type":"keyword",
-      "copy_to":"minhash_value"
-    },
-    "minhash_value":{
-      "type":"minhash",
-      "store":true,
-      "minhash_analyzer":"minhash_analyzer"
-    }
-   }
-  }
-}
 
 
 
-POST /_bulk
-{ "index" : { "_index" : "my_index", "_id" : "1" } }
-{ "message":"2023/12/07" }
-{ "index" : { "_index" : "my_index", "_id" : "2" } }
-{ "message":"2023/12/07,Y/m/j H:i" }
-{ "index" : { "_index" : "my_index", "_id" : "3" } }
-{ "message":"2023/12/07,l j F Y " }
-{ "index" : { "_index" : "my_index", "_id" : "4" } }
-{ "message":"2023/12/07,روز w از هفته " }
-
-GET /my_index/_doc/2?pretty&stored_fields=minhash_value,_source
-
-
-
-POST /my_index/_search?pretty&stored_fields=minhash_value,_source
-
+    POST /_bulk
+    { "index" : { "_index" : "my_index", "_id" : "1" } }
+    { "message":"2023/12/07" }
+    { "index" : { "_index" : "my_index", "_id" : "2" } }
+    { "message":"2023/12/07,Y/m/j H:i" }
+    { "index" : { "_index" : "my_index", "_id" : "3" } }
+    { "message":"2023/12/07,l j F Y " }
+    { "index" : { "_index" : "my_index", "_id" : "4" } }
+    { "message":"2023/12/07,روز w از هفته " }
+    
+    GET /my_index/_doc/2?pretty&stored_fields=minhash_value,_source
+    
+    
+    
+    POST /my_index/_search?pretty&stored_fields=minhash_value,_source
+    
 
 
 
