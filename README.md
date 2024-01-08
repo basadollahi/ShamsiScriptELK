@@ -128,7 +128,7 @@ To change the number of bits and hashes, set them to a token filter setting:
 
 
 
-### Change the number of bits and hashes
+### Change the Shamsi Date
 
     DELETE /my_index
     
@@ -184,48 +184,48 @@ To change the number of bits and hashes, set them to a token filter setting:
 
 
 
+### Change the Persian Number
 
-
-DELETE /my_index
-
-PUT /my_index
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0,
-    "index.max_ngram_diff": 10,
-    "analysis": {
-      "analyzer": {
-        "NumbertoWord_analyzer":{
-          "type":"custom",
-          "tokenizer":"standard",
-          "filter":["numbertoword"]
+    DELETE /my_index
+    
+    PUT /my_index
+    {
+      "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "index.max_ngram_diff": 10,
+        "analysis": {
+          "analyzer": {
+            "NumbertoWord_analyzer":{
+              "type":"custom",
+              "tokenizer":"standard",
+              "filter":["numbertoword"]
+            }
+          }
         }
+      },
+      "mappings": {
+        "properties":{
+        "message":{
+          "type":"keyword",
+          "copy_to":"NumbertoWord_value"
+        },
+        "NumbertoWord_value":{
+          "type":"numbertoword",
+          "store":true,
+          "NumbertoWord_analyzer":"NumbertoWord_analyzer"
+        }
+       }
       }
     }
-  },
-  "mappings": {
-    "properties":{
-    "message":{
-      "type":"keyword",
-      "copy_to":"NumbertoWord_value"
-    },
-    "NumbertoWord_value":{
-      "type":"numbertoword",
-      "store":true,
-      "NumbertoWord_analyzer":"NumbertoWord_analyzer"
-    }
-   }
-  }
-}
-
-
-
-POST /_bulk
-{ "index" : { "_index" : "my_index", "_id" : "1" } }
-{ "message":"1234" }
-
-GET /my_index/_doc/1?pretty&stored_fields=NumbertoWord_value,_source
+    
+    
+    
+    POST /_bulk
+    { "index" : { "_index" : "my_index", "_id" : "1" } }
+    { "message":"1234" }
+    
+    GET /my_index/_doc/1?pretty&stored_fields=NumbertoWord_value,_source
 
 
 
