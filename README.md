@@ -17,7 +17,7 @@ Please file an [issue](https://github.com/codelibs/elasticsearch-minhash/issues 
 
 ### Build
 
-mvn clean package  -DskipTests=true
+$ mvn clean package  -DskipTests=true
 
 
 ## Installation
