@@ -23,7 +23,7 @@ Please file an [issue](https://github.com/codelibs/elasticsearch-minhash/issues 
 
 ## Installation
 
-    $ $ES_HOME/bin/elasticsearch-plugin install file:///{HOME_DIR}/elasticsearch-minhash-7.17.0.zip
+    $ES_HOME/bin/elasticsearch-plugin install file:///{HOME_DIR}/elasticsearch-minhash-7.17.0.zip
 
 
 ## Getting Started
