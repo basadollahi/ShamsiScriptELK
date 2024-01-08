@@ -15,7 +15,7 @@ Using a field type and a token filter provided by this plugin, you can add a min
 
 Please file an [issue](https://github.com/codelibs/elasticsearch-minhash/issues "issue").
 
-##build 
+### Build
 
 mvn clean package  -DskipTests=true
 
