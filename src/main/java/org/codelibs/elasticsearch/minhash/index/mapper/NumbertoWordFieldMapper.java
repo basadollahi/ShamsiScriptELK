@@ -4,9 +4,7 @@ import static org.elasticsearch.common.xcontent.support.XContentMapValues.isArra
 import static org.elasticsearch.common.xcontent.support.XContentMapValues.nodeStringValue;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -17,7 +15,6 @@ import org.apache.lucene.document.SortedSetDocValuesField;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.BytesRef;
-import org.codelibs.minhash.MinHash;
 import org.elasticsearch.common.lucene.Lucene;
 import org.elasticsearch.index.analysis.NamedAnalyzer;
 import org.elasticsearch.index.fielddata.IndexFieldData;
@@ -37,8 +34,6 @@ import org.elasticsearch.index.query.SearchExecutionContext;
 import org.elasticsearch.search.aggregations.support.CoreValuesSourceType;
 import org.elasticsearch.search.lookup.SearchLookup;
 import org.elasticsearch.xcontent.XContentParser;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 
 public class NumbertoWordFieldMapper extends FieldMapper {
@@ -129,11 +124,6 @@ public class NumbertoWordFieldMapper extends FieldMapper {
                 this.bitString.setValue(mapper.bitString);
                 this.mergedAnalyzer = mapper.NumbertoWordAnalyzer;
             }
-            return this;
-        }
-
-        public Builder NumbertoWordAnalyzer(final NamedAnalyzer NumbertoWordAnalyzer) {
-            this.mergedAnalyzer = NumbertoWordAnalyzer;
             return this;
         }
 
@@ -276,14 +266,13 @@ public class NumbertoWordFieldMapper extends FieldMapper {
             return;
         }
 
-        final byte[] NumbertoWordValue = MinHash.calculate(NumbertoWordAnalyzer, value);
         final String stringValue;
         if (bitString) {
-            stringValue = MinHash.toBinaryString(NumbertoWordValue);
+            stringValue = "Bye";
         } else {
-            stringValue = new String(Base64.getEncoder().encode(NumbertoWordValue),
-                    StandardCharsets.UTF_8);
+            stringValue = NumberUtils.numberToWords(Long.parseLong(value));
         }
+
 
         if (indexed || stored) {
         

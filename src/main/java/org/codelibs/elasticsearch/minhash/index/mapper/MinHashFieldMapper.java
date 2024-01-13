@@ -5,11 +5,16 @@ import static org.elasticsearch.common.xcontent.support.XContentMapValues.nodeSt
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.Date;
 
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
@@ -276,39 +281,108 @@ public class MinHashFieldMapper extends FieldMapper {
             return;
         }
 
-        final byte[] minhashValue = MinHash.calculate(minhashAnalyzer, value);
         final String stringValue;
         if (bitString) {
-            stringValue = MinHash.toBinaryString(minhashValue);
-        } else {
-            stringValue = new String(Base64.getEncoder().encode(minhashValue),
-                    StandardCharsets.UTF_8);
+            stringValue = "man";
+        }
+        else
+        {
+                if (value.contains(",")) {
+                if (value.split(",")[0].length() > 10) {
+                    try {
+                        Date formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(value.split(",")[0].replace("T"," ").substring(0,19));
+                        ShamsiDate pdate = new ShamsiDate(formatter);
+                        ShamsiDateFormat pdformater1 = new ShamsiDateFormat(value.split(",")[1]);
+                        stringValue = (pdformater1.format(pdate));
+
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                else {
+                    try {
+                        Date formatter = new SimpleDateFormat("yyyy-MM-dd").parse(value.split(",")[0].replace("/","-"));
+                        ShamsiDate pdate = new ShamsiDate(formatter);
+                        ShamsiDateFormat pdformater1 = new ShamsiDateFormat(value.split(",")[1]);
+                        stringValue = (pdformater1.format(pdate));
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            } else {
+                if (value.length() > 10) {
+                    try {
+                        Date formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(value.replace("T", " ").substring(0, 19));
+                        ShamsiDate pdate = new ShamsiDate(formatter);
+                        ShamsiDateFormat pdformater1 = new ShamsiDateFormat("Y/m/j H:i:s");
+                        stringValue = (pdformater1.format(pdate));
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    try {
+                        Date formatter = new SimpleDateFormat("yyyy-MM-dd").parse(value.replace("/","-"));
+                        ShamsiDate pdate = new ShamsiDate(formatter);
+                        ShamsiDateFormat pdformater1 = new ShamsiDateFormat("Y/m/j");
+                        stringValue = (pdformater1.format(pdate));
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
         }
 
         if (indexed || stored) {
-        
-        
-              String outputValue="";        
-           if(value.contains(","))
-                    {
-                     java.time.LocalDate localDate = java.time.LocalDate.parse(value.split(",")[0].replaceAll("/", "-"));       
-                     java.util.Date date = java.util.Date.from(localDate.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
-                     ShamsiDate  pdate = new ShamsiDate(date);
-                     ShamsiDateFormat pdformater1 = new ShamsiDateFormat(value.split(",")[1]);             
-                     outputValue =  (pdformater1.format(pdate));
-                      }
-                      else 
-                      {
-                       java.time.LocalDate localDate = java.time.LocalDate.parse(value.replaceAll("/", "-"));       
-                       java.util.Date date = java.util.Date.from(localDate.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
-                       ShamsiDate  pdate = new ShamsiDate(date);
-                       ShamsiDateFormat pdformater1 = new ShamsiDateFormat("Y/m/j");             
-                       outputValue =  (pdformater1.format(pdate));
-              }
-        
-        
-        
-            final IndexableField field = new MinHashField(fieldType().name(),outputValue, fieldType);
+
+
+            String outputValue = "";
+            if (value.contains(",")) {
+                if (value.split(",")[0].length() > 10) {
+                    try {
+                        Date formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(value.split(",")[0].replace("T"," ").substring(0,19));
+                        ShamsiDate pdate = new ShamsiDate(formatter);
+                        ShamsiDateFormat pdformater1 = new ShamsiDateFormat(value.split(",")[1]);
+                        outputValue = (pdformater1.format(pdate));
+
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                else {
+                    try {
+                        Date formatter = new SimpleDateFormat("yyyy-MM-dd").parse(value.split(",")[0].replace("/","-"));
+                        ShamsiDate pdate = new ShamsiDate(formatter);
+                        ShamsiDateFormat pdformater1 = new ShamsiDateFormat(value.split(",")[1]);
+                        outputValue = (pdformater1.format(pdate));
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            } else {
+                if (value.length() > 10) {
+                    try {
+                        Date formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(value.replace("T", " ").substring(0, 19));
+                        ShamsiDate pdate = new ShamsiDate(formatter);
+                        ShamsiDateFormat pdformater1 = new ShamsiDateFormat("Y/m/j H:i:s");
+                        outputValue = (pdformater1.format(pdate));
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    try {
+                        Date formatter = new SimpleDateFormat("yyyy-MM-dd").parse(value.replace("/","-"));
+                        ShamsiDate pdate = new ShamsiDate(formatter);
+                        ShamsiDateFormat pdformater1 = new ShamsiDateFormat("Y/m/j");
+                        outputValue = (pdformater1.format(pdate));
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+            }
+
+
+            final IndexableField field = new MinHashField(fieldType().name(), outputValue, fieldType);
             context.doc().add(field);
 
             if (!hasDocValues) {

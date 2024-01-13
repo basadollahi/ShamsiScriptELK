@@ -1,6 +1,5 @@
 package org.codelibs.elasticsearch.minhash;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,12 +29,10 @@ public class MinHashPlugin extends Plugin implements MapperPlugin, AnalysisPlugi
     @Override
     public Map<String, Mapper.TypeParser> getMappers() {
     
-    
             Map<String, Mapper.TypeParser> s= new HashMap<String, Mapper.TypeParser>();
             s.put(MinHashFieldMapper.CONTENT_TYPE, new MinHashFieldMapper.TypeParser());
             s.put(NumbertoWordFieldMapper.CONTENT_TYPE, new NumbertoWordFieldMapper.TypeParser());
-    
-          return s;
+            return s;
     }
 
 }
