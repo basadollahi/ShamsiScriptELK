@@ -124,78 +124,78 @@ To change the number of bits and hashes, set them to a token filter setting:
 
 
 
-    GET _search
-{
-  "query": {
-    "match_all": {}
-  }
-}
+### GET _search
+    {
+      "query": {
+        "match_all": {}
+      }
+    }
 
 
 
-### Change the number of bits and hashes
+### Change the Persiandate
 
-DELETE /my_index
+    DELETE /my_index
 
-PUT /my_index
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0,
-    "index.max_ngram_diff": 10,
-      "analysis":{
-      "analyzer":{
-        "minhash_analyzer":{
-          "type":"custom",
-          "tokenizer":"standard",
-          "filter":["minhash"]
+    PUT /my_index
+    {
+      "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "index.max_ngram_diff": 10,
+          "analysis":{
+          "analyzer":{
+            "minhash_analyzer":{
+              "type":"custom",
+              "tokenizer":"standard",
+              "filter":["minhash"]
+            }
+          }
+        
+      }
+      },
+      "mappings": {
+        "properties":{
+        "message":{
+          "type":"keyword",
+          "copy_to":"minhash_value"
+        },
+        "minhash_value":{
+          "type":"minhash",
+          "store":true,
+          "minhash_analyzer":"minhash_analyzer"
+        }
         }
       }
+    }
     
-  }
-  },
-  "mappings": {
-    "properties":{
-    "message":{
-      "type":"keyword",
-      "copy_to":"minhash_value"
-    },
-    "minhash_value":{
-      "type":"minhash",
-      "store":true,
-      "minhash_analyzer":"minhash_analyzer"
+    
+    
+    
+    POST /_bulk
+    { "index" : { "_index" : "my_index", "_id" : "1" } }
+    { "message" : "2023/12/29" }
+    { "index" : { "_index" : "my_index", "_id" : "2" } }
+    { "message" : "2023/12/29,Y/m/j" }
+    { "index" : { "_index" : "my_index", "_id" : "3" } }
+    { "message" : "2023/12/07,l j F Y" }
+    
+    GET /my_index/_doc/1?pretty&stored_fields=minhash_value,_source"
+    
+    
+     POST /my_index/_search
+    {  
+     "query":{  
+       "match_all":{  
+    
+       }
+     },
+     "script_fields":{  
+       "aDate":{  
+          "script":"doc['minhash_value'].value"
+       }
+     }
     }
-    }
-  }
-}
-
-
-
-
-POST /_bulk
-{ "index" : { "_index" : "my_index", "_id" : "1" } }
-{ "message" : "2023/12/29" }
-{ "index" : { "_index" : "my_index", "_id" : "2" } }
-{ "message" : "2023/12/29,Y/m/j" }
-{ "index" : { "_index" : "my_index", "_id" : "3" } }
-{ "message" : "2023/12/07,l j F Y" }
-
-GET /my_index/_doc/1?pretty&stored_fields=minhash_value,_source"
-
-
- POST /my_index/_search
-{  
- "query":{  
-   "match_all":{  
-
-   }
- },
- "script_fields":{  
-   "aDate":{  
-      "script":"doc['minhash_value'].value"
-   }
- }
-}
 
     
 
