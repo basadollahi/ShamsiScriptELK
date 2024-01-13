@@ -197,6 +197,69 @@ To change the number of bits and hashes, set them to a token filter setting:
      }
     }
 
+
+### Change the Number2Word
+
+    DELETE /haneng_test
+
+    PUT /haneng_test
+    {
+      "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "index.max_ngram_diff": 10,
+        "analysis": {
+          "analyzer": {
+            "engtohan_analyzer": {
+              "type": "custom",
+              "tokenizer": "keyword",
+              "filter": ["Number_filter"  ]
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "name": {
+            "type": "keyword",
+            "copy_to": ["name_hantoeng", "name_engtohan"]
+          },
+          "name_hantoeng": {
+            "type": "text",
+            "search_analyzer": "engtohan_analyzer"
+          }
+        }
+      }
+    }
+    
+    
+    POST /_bulk
+    { "index" : { "_index" : "haneng_test", "_id" : "1" } }
+    { "name" : "صد و بیست و سه" }
+    { "index" : { "_index" : "haneng_test", "_id" : "2" } }
+    { "name" : "elastic" }
+    { "index" : { "_index" : "haneng_test", "_id" : "3" } }
+    { "name" : "123" }
+    { "index" : { "_index" : "haneng_test", "_id" : "4" } }
+    { "name" : "یک" }
+    
+    
+    
+    
+    
+    
+    
+    POST /haneng_test/_search
+    {
+      "query": {
+        "match": {
+          "name_hantoeng": "100 "
+        }
+      }
+    }
+
+
+
     
 
 The above allows to set the number of bits to 2, the number of hashes to 32 and the seed of hash to 100.
