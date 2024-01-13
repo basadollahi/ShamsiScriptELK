@@ -133,6 +133,9 @@ To change the number of bits and hashes, set them to a token filter setting:
 
 
 
+### Change the number of bits and hashes
+
+DELETE /my_index
 
 PUT /my_index
 {
