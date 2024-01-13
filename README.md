@@ -258,7 +258,160 @@ To change the number of bits and hashes, set them to a token filter setting:
       }
     }
 
-
+### Change the Complitly
+    
+    DELETE /haneng_test
+    
+    PUT /haneng_test
+    {
+      "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "index.max_ngram_diff": 10,
+        "analysis": {
+          "analyzer": {
+            "numbertoword": {
+              "type": "custom",
+              "tokenizer": "my_tokenizer",
+              "filter": ["Number_filter"  ],
+              "generate_word_parts" : true,
+              "preserve_original" : true
+            },
+            "PersianDate": {
+              "type": "custom",
+              "tokenizer": "my_tokenizer",
+              "filter": ["shamsi_normalizer"  ],
+              "generate_word_parts" : true,
+              "preserve_original" : true
+            }
+          },
+          "tokenizer": {
+            "my_tokenizer": {
+              "type": "pattern",
+              "pattern": "!"
+            }
+          }
+        }
+      },
+        "mappings": {
+          "properties": {
+            "name": {
+              "type": "keyword",
+              "copy_to": ["name_ntw", "name_pd"]
+            },
+            "name_ntw": {
+              "type": "text",
+              "index": true,
+              "search_analyzer": "numbertoword"
+            },
+            "name_pd": {
+              "type": "text",
+              "index": true,
+              "search_analyzer": "PersianDate"
+            }
+          }
+        }
+    }
+    
+    POST /_bulk
+    { "index" : { "_index" : "haneng_test", "_id" : "1" } }
+    { "name" : "صد و بیست و سه" }
+    { "index" : { "_index" : "haneng_test", "_id" : "2" } }
+    { "name" : "elastic" }
+    { "index" : { "_index" : "haneng_test", "_id" : "3" } }
+    { "name" : "123" }
+    { "index" : { "_index" : "haneng_test", "_id" : "4" } }
+    { "name" : "یک" }
+    { "index" : { "_index" : "haneng_test", "_id" : "5" } }
+    { "name" : "پنج‌شنبه 16 آذر 1402"  }
+    { "index" : { "_index" : "haneng_test", "_id" : "6" } }
+    { "name" :  "16 آذر 1402" }
+    { "index" : { "_index" : "haneng_test", "_id" : "7" } }
+    { "name" : "1402 "}
+    { "index" : { "_index" : "haneng_test", "_id" : "8" } }
+    { "name" : "1402/09/16"}
+    
+    
+    POST haneng_test/_analyze
+    {
+      "analyzer": "numbertoword",
+      "text": "123"
+    }
+    
+    
+    GET /haneng_test/_search
+    {
+      "query": {
+       "multi_match" : {
+          "query":      "123",
+          "type":       "cross_fields",
+          "analyzer":   "numbertoword",
+          "fields":     [ "name"]
+        }
+      }
+    }
+    
+    
+    GET /haneng_test/_search
+    {
+      "query": {
+       "multi_match" : {
+          "query":      "2023/12/07,l j F Y",
+          "analyzer":   "PersianDate",
+          "fields":     [ "name"]
+        }
+      }
+    }
+    
+    
+    
+    GET _analyze
+    {
+      "tokenizer": "keyword",
+      "filter" : ["shamsi_normalizer"],
+      "text" : "2023/12/07,l j F Y "
+    }
+    
+    
+    
+    POST /haneng_test/_search
+    {
+      "query": {
+        "bool": {
+          "should": [
+            { "match": { "name_hantoeng": "123" }},
+            { "match": { "name_hantoeng": "3" }}
+          ]
+        }
+      }
+    }
+    
+    POST /haneng_test/_search
+    {
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "match": {
+                "name_hantoeng":"100"
+              }
+            },
+            {
+              "match": {
+                "name_hantoeng":"20"
+              }
+            },
+            {
+              "match": {
+                "name_hantoeng":"3"
+              }
+            }
+          ]
+        }
+      }
+     
+    }
+    
 
     
 
