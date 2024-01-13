@@ -413,7 +413,95 @@ To change the number of bits and hashes, set them to a token filter setting:
     }
     
 
+    DELETE crimes
     
+    POST /crimes/_close
+    
+    
+    PUT /crimes/_settings
+    {
+        "analysis": {
+          "analyzer": {
+            "minhash_analyzer":{
+              "type":"custom",
+              "tokenizer":"standard",
+              "filter":["minhash"]
+            }
+          }
+        }
+    }
+    
+    PUT /crimes/_mappings
+    {
+       "properties":{
+        "datetime2":{
+          "type":"date",
+          "copy_to":"minhash_value"
+        },
+        "minhash_value":{
+          "type":"minhash",
+          "store":true,
+          "minhash_analyzer":"minhash_analyzer"
+        }
+       }
+    }
+    
+    
+    POST /crimes/_open
+    
+    
+     POST /crimes/_search
+    {  
+     "query":{  
+       "match_all":{  
+    
+       }
+     }
+    }
+    
+    
+### Change the Complitly    
+    
+    POST crimes/_update_by_query
+    {
+      "query": {
+            "constant_score" : {
+                "filter" : {
+                    "exists" : { "field" : "datetime" }
+                }
+            }
+    
+      },
+      "script" : {
+          "inline": "SimpleDateFormat sdf = new SimpleDateFormat(\"yyyy-mm-dd hh:mm:ss\");  ctx._source.datetime2 = sdf.parse(ctx._source.datetime);"
+      }
+    }
+    
+    
+    
+    
+    POST /crimes/_search?pretty&stored_fields=minhash_value,_source
+    
+    
+    POST /crimes/_search
+    {  
+     "query":{  
+       "match_all":{  
+    
+       }
+     },
+     "script_fields":{  
+       "aDate":{  
+          "script":"doc['minhash_value'].value"
+       }
+     }
+    }
+
+
+
+
+
+        
 
 The above allows to set the number of bits to 2, the number of hashes to 32 and the seed of hash to 100.
 
