@@ -411,7 +411,7 @@ To change the number of bits and hashes, set them to a token filter setting:
       }
      
     }
-    
+### Change the Complitly        
 
     DELETE crimes
     
@@ -460,7 +460,7 @@ To change the number of bits and hashes, set them to a token filter setting:
     }
     
     
-### Change the Complitly    
+
     
     POST crimes/_update_by_query
     {
