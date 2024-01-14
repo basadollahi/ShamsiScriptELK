@@ -329,11 +329,11 @@ public class MinHashFieldMapper extends FieldMapper {
                         throw new RuntimeException(e);
                     }
                 }
+
             }
         }
 
         if (indexed || stored) {
-
 
             String outputValue = "";
             if (value.contains(",")) {
